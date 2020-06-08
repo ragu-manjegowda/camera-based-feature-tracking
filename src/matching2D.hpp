@@ -13,10 +13,11 @@
 #include <opencv2/features2d.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/xfeatures2d.hpp>
 
 #include "dataStructures.h"
 
-enum DetectorTypeIndex
+enum class DetectorTypeIndex
 {
     FAST = 0,
     BRISK = 1,
@@ -27,8 +28,21 @@ enum DetectorTypeIndex
     HARRIS = 6
 };
 
+enum class DescriptorTypeIndex
+{
+    BRISK = 0,
+    BRIEF = 1,
+    ORB = 2,
+    FREAK = 3,
+    AKAZE = 4,
+    SIFT = 5,
+};
+
 static const std::vector<std::string> detectorTypeString{
     "FAST", "BRISK", "ORB", "AKAZE", "SIFT", "SHITOMASI", "HARRIS"};
+
+static const std::vector<std::string> descriptorTypeString{"BRISK", "BRIEF", "ORB",
+                                                           "FREAK", "AKAZE", "SIFT"};
 
 void detKeypointsHarris(std::vector<cv::KeyPoint> &keypoints,
                         cv::Mat &img,
@@ -46,7 +60,7 @@ void detKeypointsModern(std::vector<cv::KeyPoint> &keypoints,
 void descKeypoints(std::vector<cv::KeyPoint> &keypoints,
                    cv::Mat &img,
                    cv::Mat &descriptors,
-                   std::string descriptorType);
+                   DescriptorTypeIndex descriptorTypeIndex);
 
 void matchDescriptors(std::vector<cv::KeyPoint> &kPtsSource,
                       std::vector<cv::KeyPoint> &kPtsRef,
@@ -59,6 +73,9 @@ void matchDescriptors(std::vector<cv::KeyPoint> &kPtsSource,
 
 DetectorTypeIndex getDetectorTypeIndex(std::string &detectorType);
 const std::string &getDetectorTypeString(DetectorTypeIndex detectorTypeIndex);
+
+DescriptorTypeIndex getDescriptorTypeIndex(std::string &descriptorType);
+const std::string &getDescriptorTypeString(DescriptorTypeIndex descriptorTypeIndex);
 
 void removeKeypointsOutsideBox(cv::Rect vehicleRect,
                                std::vector<cv::KeyPoint> &keypoints,

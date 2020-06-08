@@ -94,21 +94,21 @@ int main(int argc, const char *argv[])
 
         switch (detectorTypeIndex)
         {
-            case SHITOMASI:
+            case DetectorTypeIndex::SHITOMASI:
             {
                 detKeypointsShiTomasi(keypoints, imgGray, visDetector);
                 break;
             }
-            case HARRIS:
+            case DetectorTypeIndex::HARRIS:
             {
                 detKeypointsHarris(keypoints, imgGray, visDetector);
                 break;
             }
-            case FAST:
-            case BRISK:
-            case ORB:
-            case AKAZE:
-            case SIFT:
+            case DetectorTypeIndex::FAST:
+            case DetectorTypeIndex::BRISK:
+            case DetectorTypeIndex::ORB:
+            case DetectorTypeIndex::AKAZE:
+            case DetectorTypeIndex::SIFT:
             {
                 detKeypointsModern(keypoints, imgGray, detectorTypeIndex, visDetector);
                 break;
@@ -134,59 +134,21 @@ int main(int argc, const char *argv[])
             keypoints = keypointsROI;
         }
 
-        // optional : limit number of keypoints (helpful for debugging and learning)
-        bool bLimitKpts = false;
-        if (bLimitKpts)
-        {
-            int maxKeypoints = 50;
-
-            switch (detectorTypeIndex)
-            {
-                case SHITOMASI:
-                {
-                    // there is no response info, so keep the first 50 as they are sorted
-                    // in descending quality order
-                    keypoints.erase(keypoints.begin() + maxKeypoints, keypoints.end());
-                    break;
-                }
-                case HARRIS:
-                {
-                    break;
-                }
-                case FAST:
-                case BRISK:
-                case ORB:
-                case AKAZE:
-                case SIFT:
-                {
-                    break;
-                }
-                default:
-                {
-                    throw invalid_argument("Invalid detector type");
-                }
-            }
-
-            cv::KeyPointsFilter::retainBest(keypoints, maxKeypoints);
-            cout << " NOTE: Keypoints have been limited!" << endl;
-        }
-
         // push keypoints and descriptor for current frame to end of data buffer
         (dataBuffer.back()).keypoints = keypoints;
         cout << "#2 : DETECT KEYPOINTS done" << endl;
 
         /* EXTRACT KEYPOINT DESCRIPTORS */
 
-        //// STUDENT ASSIGNMENT
-        //// TASK MP.4 -> add the following descriptors in file matching2D.cpp and enable
-        /// string-based selection based on descriptorType / -> BRIEF, ORB, FREAK, AKAZE,
-        /// SIFT
-
+        /*
+         * Enable string-based selection based on descriptorType
+         *  -> BRISK, BRIEF, ORB, FREAK, AKAZE, SIFT
+         */
         cv::Mat descriptors;
-        string descriptorType = "BRISK";  // BRIEF, ORB, FREAK, AKAZE, SIFT
+        string descriptorType = "BRISK";
+        DescriptorTypeIndex descriptorTypeIndex = getDescriptorTypeIndex(descriptorType);
         descKeypoints((dataBuffer.back()).keypoints, (dataBuffer.back()).cameraImg,
-                      descriptors, descriptorType);
-        //// EOF STUDENT ASSIGNMENT
+                      descriptors, descriptorTypeIndex);
 
         // push descriptors for current frame to end of data buffer
         (dataBuffer.back()).descriptors = descriptors;

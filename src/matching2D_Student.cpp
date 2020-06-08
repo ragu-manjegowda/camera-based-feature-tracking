@@ -45,32 +45,53 @@ void matchDescriptors(std::vector<cv::KeyPoint> &kPtsSource,
 void descKeypoints(vector<cv::KeyPoint> &keypoints,
                    cv::Mat &img,
                    cv::Mat &descriptors,
-                   string descriptorType)
+                   DescriptorTypeIndex descriptorTypeIndex)
 {
-    // select appropriate descriptor
     cv::Ptr<cv::DescriptorExtractor> extractor;
-    if (descriptorType.compare("BRISK") == 0)
+    switch (descriptorTypeIndex)
     {
-
-        int threshold = 30;         // FAST/AGAST detection threshold score.
-        int octaves = 3;            // detection octaves (use 0 to do single scale)
-        float patternScale = 1.0f;  // apply this scale to the pattern used for sampling
-                                    // the neighbourhood of a keypoint.
-
-        extractor = cv::BRISK::create(threshold, octaves, patternScale);
-    }
-    else
-    {
-
-        //...
+        case DescriptorTypeIndex::BRISK:
+        {
+            extractor = cv::BRISK::create();
+            break;
+        }
+        case DescriptorTypeIndex::BRIEF:
+        {
+            extractor = cv::xfeatures2d::BriefDescriptorExtractor::create();
+            break;
+        }
+        case DescriptorTypeIndex::ORB:
+        {
+            extractor = cv::ORB::create();
+            break;
+        }
+        case DescriptorTypeIndex::FREAK:
+        {
+            extractor = cv::xfeatures2d::FREAK::create();
+            break;
+        }
+        case DescriptorTypeIndex::AKAZE:
+        {
+            extractor = cv::AKAZE::create();
+            break;
+        }
+        case DescriptorTypeIndex::SIFT:
+        {
+            extractor = cv::SIFT::create();
+            break;
+        }
+        default:
+        {
+            throw invalid_argument("Invalid detector type");
+        }
     }
 
     // perform feature description
     double t = (double)cv::getTickCount();
     extractor->compute(img, keypoints, descriptors);
     t = ((double)cv::getTickCount() - t) / cv::getTickFrequency();
-    cout << descriptorType << " descriptor extraction in " << 1000 * t / 1.0 << " ms"
-         << endl;
+    cout << getDescriptorTypeString(descriptorTypeIndex) << " descriptor extraction in "
+         << 1000 * t / 1.0 << " ms" << endl;
 }
 
 // Detect keypoints in image using the traditional Shi-Thomasi detector
@@ -204,38 +225,38 @@ void detKeypointsModern(std::vector<cv::KeyPoint> &keypoints,
 
     switch (detectorTypeIndex)
     {
-        case BRISK:
+        case DetectorTypeIndex::BRISK:
         {
             cv::Ptr<cv::FeatureDetector> detector = cv::BRISK::create();
             detector->detect(img, keypoints);
             break;
         }
-        case FAST:
+        case DetectorTypeIndex::FAST:
         {
             cv::Ptr<cv::FeatureDetector> detector = cv::FastFeatureDetector::create();
             detector->detect(img, keypoints);
             break;
         }
-        case ORB:
+        case DetectorTypeIndex::ORB:
         {
             cv::Ptr<cv::FeatureDetector> detector = cv::ORB::create();
             detector->detect(img, keypoints);
             break;
         }
-        case AKAZE:
+        case DetectorTypeIndex::AKAZE:
         {
             cv::Ptr<cv::FeatureDetector> detector = cv::AKAZE::create();
             detector->detect(img, keypoints);
             break;
         }
-        case SIFT:
+        case DetectorTypeIndex::SIFT:
         {
             cv::Ptr<cv::FeatureDetector> detector = cv::SiftFeatureDetector::create();
             detector->detect(img, keypoints);
             break;
         }
-        case SHITOMASI:
-        case HARRIS:
+        case DetectorTypeIndex::SHITOMASI:
+        case DetectorTypeIndex::HARRIS:
         default:
         {
             throw invalid_argument("Invalid detector type");
@@ -304,12 +325,60 @@ const std::string &getDetectorTypeString(DetectorTypeIndex detectorTypeIndex)
 {
     try
     {
-        return detectorTypeString[detectorTypeIndex];
+        return detectorTypeString[static_cast<int>(detectorTypeIndex)];
     }
     catch (const std::exception &e)
     {
         std::cerr << e.what() << std::endl;
         throw invalid_argument("Invalid detector type index");
+    }
+}
+
+DescriptorTypeIndex getDescriptorTypeIndex(std::string &descriptorType)
+{
+    if (descriptorType.compare("BRISK") == 0)
+    {
+        return DescriptorTypeIndex::BRISK;
+    }
+
+    if (descriptorType.compare("BRIEF") == 0)
+    {
+        return DescriptorTypeIndex::BRIEF;
+    }
+
+    if (descriptorType.compare("ORB") == 0)
+    {
+        return DescriptorTypeIndex::ORB;
+    }
+
+    if (descriptorType.compare("FREAK") == 0)
+    {
+        return DescriptorTypeIndex::FREAK;
+    }
+
+    if (descriptorType.compare("AKAZE") == 0)
+    {
+        return DescriptorTypeIndex::AKAZE;
+    }
+
+    if (descriptorType.compare("SIFT") == 0)
+    {
+        return DescriptorTypeIndex::SIFT;
+    }
+
+    throw invalid_argument("Invalid detector type");
+}
+
+const std::string &getDescriptorTypeString(DescriptorTypeIndex descriptorTypeIndex)
+{
+    try
+    {
+        return descriptorTypeString[static_cast<int>(descriptorTypeIndex)];
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << std::endl;
+        throw invalid_argument("Invalid descriptor type index");
     }
 }
 
