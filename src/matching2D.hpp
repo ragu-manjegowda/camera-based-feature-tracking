@@ -60,4 +60,8 @@ void matchDescriptors(std::vector<cv::KeyPoint> &kPtsSource,
 DetectorTypeIndex getDetectorTypeIndex(std::string &detectorType);
 const std::string &getDetectorTypeString(DetectorTypeIndex detectorTypeIndex);
 
+void removeKeypointsOutsideBox(cv::Rect vehicleRect,
+                               std::vector<cv::KeyPoint> &keypoints,
+                               std::vector<cv::KeyPoint> &keypointsROI);
+
 #endif /* matching2D_hpp */

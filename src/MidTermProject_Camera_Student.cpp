@@ -86,6 +86,7 @@ int main(int argc, const char *argv[])
          * -> HARRIS, FAST, BRISK, ORB, AKAZE, SIFT
          */
 
+        // Default to SIFT detector
         string detectorType = "SIFT";
         bool visDetector = true;
 
@@ -118,18 +119,20 @@ int main(int argc, const char *argv[])
             }
         }
 
-        //// STUDENT ASSIGNMENT
-        //// TASK MP.3 -> only keep keypoints on the preceding vehicle
-
         // only keep keypoints on the preceding vehicle
         bool bFocusOnVehicle = true;
         cv::Rect vehicleRect(535, 180, 180, 150);
+        vector<cv::KeyPoint> keypointsROI;
+
         if (bFocusOnVehicle)
         {
-            // ...
+            /*
+             * Removal logic with vector is not optimized, since this is temporary and
+             * gets removed in final project.
+             */
+            removeKeypointsOutsideBox(vehicleRect, keypoints, keypointsROI);
+            keypoints = keypointsROI;
         }
-
-        //// EOF STUDENT ASSIGNMENT
 
         // optional : limit number of keypoints (helpful for debugging and learning)
         bool bLimitKpts = false;

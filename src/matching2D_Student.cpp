@@ -312,3 +312,16 @@ const std::string &getDetectorTypeString(DetectorTypeIndex detectorTypeIndex)
         throw invalid_argument("Invalid detector type index");
     }
 }
+
+void removeKeypointsOutsideBox(cv::Rect vehicleRect,
+                               std::vector<cv::KeyPoint> &keypoints,
+                               std::vector<cv::KeyPoint> &keypointsROI)
+{
+    for (auto &keypoint : keypoints)
+    {
+        if (vehicleRect.contains(keypoint.pt))
+        {
+            keypointsROI.push_back(keypoint);
+        }
+    }
+}
