@@ -80,22 +80,43 @@ int main(int argc, const char *argv[])
 
         // extract 2D keypoints from current image
         vector<cv::KeyPoint> keypoints;  // create empty feature list for current image
-        string detectorType = "SHITOMASI";
 
-        //// STUDENT ASSIGNMENT
-        //// TASK MP.2 -> add the following keypoint detectors in file matching2D.cpp and
-        /// enable string-based selection based on detectorType / -> HARRIS, FAST, BRISK,
-        /// ORB, AKAZE, SIFT
+        /*
+         * Enable string-based selection based on detectorType
+         * -> HARRIS, FAST, BRISK, ORB, AKAZE, SIFT
+         */
 
-        if (detectorType.compare("SHITOMASI") == 0)
+        string detectorType = "SIFT";
+        bool visDetector = true;
+
+        DetectorTypeIndex detectorTypeIndex = getDetectorTypeIndex(detectorType);
+
+        switch (detectorTypeIndex)
         {
-            detKeypointsShiTomasi(keypoints, imgGray, false);
+            case SHITOMASI:
+            {
+                detKeypointsShiTomasi(keypoints, imgGray, visDetector);
+                break;
+            }
+            case HARRIS:
+            {
+                detKeypointsHarris(keypoints, imgGray, visDetector);
+                break;
+            }
+            case FAST:
+            case BRISK:
+            case ORB:
+            case AKAZE:
+            case SIFT:
+            {
+                detKeypointsModern(keypoints, imgGray, detectorTypeIndex, visDetector);
+                break;
+            }
+            default:
+            {
+                throw invalid_argument("Invalid detector type");
+            }
         }
-        else
-        {
-            //...
-        }
-        //// EOF STUDENT ASSIGNMENT
 
         //// STUDENT ASSIGNMENT
         //// TASK MP.3 -> only keep keypoints on the preceding vehicle
@@ -116,11 +137,33 @@ int main(int argc, const char *argv[])
         {
             int maxKeypoints = 50;
 
-            if (detectorType.compare("SHITOMASI") == 0)
-            {  // there is no response info, so keep the first 50 as they are sorted in
-               // descending quality order
-                keypoints.erase(keypoints.begin() + maxKeypoints, keypoints.end());
+            switch (detectorTypeIndex)
+            {
+                case SHITOMASI:
+                {
+                    // there is no response info, so keep the first 50 as they are sorted
+                    // in descending quality order
+                    keypoints.erase(keypoints.begin() + maxKeypoints, keypoints.end());
+                    break;
+                }
+                case HARRIS:
+                {
+                    break;
+                }
+                case FAST:
+                case BRISK:
+                case ORB:
+                case AKAZE:
+                case SIFT:
+                {
+                    break;
+                }
+                default:
+                {
+                    throw invalid_argument("Invalid detector type");
+                }
             }
+
             cv::KeyPointsFilter::retainBest(keypoints, maxKeypoints);
             cout << " NOTE: Keypoints have been limited!" << endl;
         }
@@ -189,7 +232,7 @@ int main(int argc, const char *argv[])
                                 cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 
                 string windowName = "Matching keypoints between two camera images";
-                cv::namedWindow(windowName, 7);
+                cv::namedWindow(windowName, 8);
                 cv::imshow(windowName, matchImg);
                 cout << "Press key to continue to next image" << endl;
                 cv::waitKey(0);  // wait for key to be pressed
