@@ -69,10 +69,8 @@ int main(int argc, const char *argv[])
         {
             dataBuffer.pop_front();
         }
-        else
-        {
-            dataBuffer.push_back(frame);
-        }
+        
+        dataBuffer.push_back(frame);
 
         cout << "#1 : LOAD IMAGE INTO BUFFER done" << endl;
 
