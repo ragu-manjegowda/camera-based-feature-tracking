@@ -288,7 +288,7 @@ void detKeypointsModern(std::vector<cv::KeyPoint> &keypoints,
     }
 
     t = ((double)cv::getTickCount() - t) / cv::getTickFrequency();
-    cout << getDetectorTypeString(detectorTypeIndex) + " corner detection with n="
+    cout << getDetectorTypeString(detectorTypeIndex) + " detection with n="
          << keypoints.size() << " keypoints in " << 1000 * t / 1.0 << " ms" << endl;
 
     // visualize results
@@ -298,7 +298,7 @@ void detKeypointsModern(std::vector<cv::KeyPoint> &keypoints,
         cv::drawKeypoints(img, keypoints, visImage, cv::Scalar::all(-1),
                           cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
         string windowName =
-            getDetectorTypeString(detectorTypeIndex) + " corner Detector Results";
+            getDetectorTypeString(detectorTypeIndex) + " Detector Results";
         cv::namedWindow(windowName, static_cast<int>(detectorTypeIndex) + 1);
         imshow(windowName, visImage);
         cv::waitKey(0);
